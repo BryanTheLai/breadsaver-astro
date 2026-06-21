@@ -76,12 +76,13 @@ function escapeHtml(value: string): string {
   });
 }
 
-function icon(name: "clock" | "mapPin" | "package" | "percent" | "x"): string {
-  const paths: Record<"clock" | "mapPin" | "package" | "percent" | "x", string> = {
+function icon(name: "clock" | "mapPin" | "package" | "percent" | "shoppingBag" | "x"): string {
+  const paths: Record<"clock" | "mapPin" | "package" | "percent" | "shoppingBag" | "x", string> = {
     clock: `<circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path>`,
     mapPin: `<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle>`,
     package: `<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><path d="M12 22V12"></path><path d="m3.3 7 8.7 5 8.7-5"></path>`,
     percent: `<line x1="19" x2="5" y1="5" y2="19"></line><circle cx="6.5" cy="6.5" r="2.5"></circle><circle cx="17.5" cy="17.5" r="2.5"></circle>`,
+    shoppingBag: `<path d="M16 10a4 4 0 0 1-8 0"></path><path d="M3.1 6.4a1 1 0 0 1 1-.9h15.8a1 1 0 0 1 1 .9l1.1 13a2 2 0 0 1-2 2.1H4a2 2 0 0 1-2-2.1z"></path>`,
     x: `<path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>`,
   };
 
@@ -92,6 +93,14 @@ function animateIntoView(selector: string, y = 12): void {
   if (prefersReducedMotion) return;
   window.requestAnimationFrame(() => {
     animate(selector, { opacity: [0, 1], y: [y, 0] }, { duration: 0.36, delay: stagger(0.045), ease: [0.16, 1, 0.3, 1] });
+  });
+}
+
+function animateListingChrome(): void {
+  if (prefersReducedMotion) return;
+  window.requestAnimationFrame(() => {
+    animate(".listing-card .discount-pill", { opacity: [0, 1], scale: [0.92, 1] }, { duration: 0.26, delay: stagger(0.035), ease: [0.16, 1, 0.3, 1] });
+    animate(".listing-card .primary-btn", { opacity: [0, 1], y: [8, 0] }, { duration: 0.3, delay: stagger(0.04), ease: [0.16, 1, 0.3, 1] });
   });
 }
 
@@ -213,7 +222,7 @@ function listingCard(listing: Listing): string {
         </div>
         <div class="card-footer">
           <p class="pickup-line">${icon("clock")} ${pickupWindow}</p>
-          <button class="primary-btn" data-open-listing="${listing.id}" ${soldOut ? "disabled" : ""}>${soldOut ? "Unavailable" : `${icon("package")} Reserve`}</button>
+          <button class="primary-btn" data-open-listing="${listing.id}" ${soldOut ? "disabled" : ""}>${soldOut ? "Unavailable" : `${icon("shoppingBag")} Reserve`}</button>
         </div>
       </div>
     </article>
@@ -232,6 +241,7 @@ function renderMarket(): void {
   renderMap(listings);
   renderActiveOrder();
   animateIntoView("#listing-grid .listing-card", 14);
+  animateListingChrome();
 }
 
 function renderMap(listings: Listing[]): void {
@@ -259,7 +269,7 @@ function mapFallback(listings: Listing[]): string {
     const bakery = findBakery(state, listing.bakeryId);
     const x = 18 + ((bakery.longitude - 101.707) / (101.722 - 101.707)) * 64;
     const y = 72 - ((bakery.latitude - 3.198) / (3.211 - 3.198)) * 54;
-    return `<button class="fallback-pin" style="left:${Math.min(86, Math.max(12, x))}%; top:${Math.min(82, Math.max(14, y))}%;" data-map-pin="${listing.id}" aria-label="${escapeHtml(listing.title)}">${listing.quantityAvailable}</button>`;
+    return `<button class="fallback-pin" style="left:${Math.min(86, Math.max(12, x))}%; top:${Math.min(82, Math.max(14, y))}%;" data-map-pin="${listing.id}" aria-label="${escapeHtml(listing.title)}, ${discountPercent(listing)} percent off">${discountPercent(listing)}%</button>`;
   });
 
   return `
@@ -270,6 +280,16 @@ function mapFallback(listings: Listing[]): string {
       </div>
       <p>Live Mapbox is unavailable. Pickup pins still work.</p>
     </div>
+  `;
+}
+
+function showMapFallback(listings: Listing[], status: string): void {
+  const shell = optional<HTMLElement>(".mapbox-shell");
+  if (!shell) return;
+  disposeMapboxMap();
+  shell.innerHTML = `
+    ${mapFallback(listings)}
+    <div class="map-status" id="map-status">${escapeHtml(status)}</div>
   `;
 }
 
@@ -348,7 +368,7 @@ async function syncMapboxMap(listings: Listing[]): Promise<void> {
     if (state.browseMode !== "map" || !optional<HTMLElement>("#mapbox-map")) return;
 
     if (!mapboxgl.supported()) {
-      optional("#map-status")?.replaceChildren(document.createTextNode("Mapbox needs WebGL"));
+      showMapFallback(listings, "Mapbox needs WebGL");
       return;
     }
 
@@ -372,7 +392,7 @@ async function syncMapboxMap(listings: Listing[]): Promise<void> {
       optional("#map-status")?.replaceChildren(document.createTextNode("Mapbox could not load"));
     });
   } catch {
-    optional("#map-status")?.replaceChildren(document.createTextNode("Map unavailable"));
+    showMapFallback(listings, "Map unavailable");
   }
 }
 
@@ -415,11 +435,13 @@ function receipt(order: Order): string {
   if (!listing) return "";
   const bakery = findBakery(state, order.bakeryId);
   const complete = order.status === "picked_up";
+  const discount = discountPercent(listing);
 
   return `
     <article class="order-card">
       <div class="badge-row">
         <span class="badge ${complete ? "" : "warn"}">${complete ? "Picked up" : "Paid"}</span>
+        <span class="badge warn">${discount}% off</span>
         <span class="badge">${escapeHtml(order.id)}</span>
       </div>
       <h3>${escapeHtml(bakery.name)}</h3>
@@ -460,6 +482,7 @@ function renderBakery(): void {
     <div class="queue-card">
       <div class="queue-row">
         <strong>${escapeHtml(listing.title)}</strong>
+        <span class="badge warn">${discountPercent(listing)}% off</span>
         <span class="badge ${listing.status === "sold_out" ? "danger" : ""}">${listing.status === "sold_out" ? "Sold out" : `${listing.quantityAvailable} left`}</span>
       </div>
       <p class="muted">${money(listing.discountedPrice)} - Collect ${escapeHtml(listing.pickupStart)}-${escapeHtml(listing.pickupEnd)}</p>
@@ -473,7 +496,7 @@ function renderBakery(): void {
           <div class="queue-card">
             <div class="badge-row"><span class="badge">Paid</span><span class="badge">${escapeHtml(order.pickupCode)}</span></div>
             <h3>${escapeHtml(listing?.title ?? "Order")}</h3>
-            <p class="muted">${escapeHtml(order.customerName)} - ${money(order.totalPaid)} - saved ${money(order.totalSaved)}</p>
+            <p class="muted">${escapeHtml(order.customerName)} - ${listing ? `${discountPercent(listing)}% off - ` : ""}${money(order.totalPaid)} - saved ${money(order.totalSaved)}</p>
             <button class="primary-btn" data-pickup="${order.id}">Mark picked up</button>
           </div>
         `;
@@ -523,7 +546,7 @@ function openListing(listingId: string): void {
           <h3>Ingredients and allergens</h3>
           <p>${escapeHtml(listing.ingredients)} ${escapeHtml(listing.allergens)}</p>
         </div>
-        <button class="primary-btn" data-reserve="${listing.id}" ${isPurchasable(listing) ? "" : "disabled"}>${icon("package")} Pay and reserve</button>
+        <button class="primary-btn" data-reserve="${listing.id}" ${isPurchasable(listing) ? "" : "disabled"}>${icon("shoppingBag")} Pay and reserve</button>
       </div>
     </div>
   `;

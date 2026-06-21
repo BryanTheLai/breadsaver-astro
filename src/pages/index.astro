@@ -1,5 +1,5 @@
 ---
-import { Clock3, List, Map, MapPinned, PackageCheck, Percent, ReceiptText, Search, ShoppingBag, Store } from "@lucide/astro";
+import { Clock3, List, Map, MapPinned, PackageCheck, Percent, ReceiptText, Search, ShoppingBag, Store, X } from "@lucide/astro";
 import "../styles/global.css";
 ---
 
@@ -30,7 +30,7 @@ import "../styles/global.css";
 						<div class="market-title-row">
 							<div>
 								<p class="eyebrow">Setapak tonight</p>
-								<h1 id="market-title">Discounted bread</h1>
+								<h1 id="market-title">Bread deals</h1>
 							</div>
 							<button class="field-button location-pill" id="open-location"><MapPinned size={18} aria-hidden="true" /><span id="area-label">Setapak</span></button>
 						</div>
@@ -173,7 +173,7 @@ import "../styles/global.css";
 						<p class="eyebrow">Manual location fallback</p>
 						<h2>Choose pickup area</h2>
 					</div>
-					<button class="icon-btn" data-close-dialog aria-label="Close">Close</button>
+					<button class="icon-btn" data-close-dialog aria-label="Close"><X size={18} aria-hidden="true" /></button>
 				</div>
 				<div class="location-options">
 					<button class="field-button" data-area="Setapak" data-radius="3">Setapak - 3 km</button>
