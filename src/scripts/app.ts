@@ -77,7 +77,7 @@ function escapeHtml(value: string): string {
 }
 
 function icon(name: "clock" | "mapPin" | "package" | "percent" | "x"): string {
-  const paths: Record<typeof name, string> = {
+  const paths: Record<"clock" | "mapPin" | "package" | "percent" | "x", string> = {
     clock: `<circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path>`,
     mapPin: `<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle>`,
     package: `<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><path d="M12 22V12"></path><path d="m3.3 7 8.7 5 8.7-5"></path>`,
@@ -91,20 +91,20 @@ function icon(name: "clock" | "mapPin" | "package" | "percent" | "x"): string {
 function animateIntoView(selector: string, y = 12): void {
   if (prefersReducedMotion) return;
   window.requestAnimationFrame(() => {
-    animate(selector, { opacity: [0, 1], y: [y, 0] }, { duration: 0.36, delay: stagger(0.045), easing: [0.16, 1, 0.3, 1] });
+    animate(selector, { opacity: [0, 1], y: [y, 0] }, { duration: 0.36, delay: stagger(0.045), ease: [0.16, 1, 0.3, 1] });
   });
 }
 
 function animateActiveView(): void {
   if (prefersReducedMotion) return;
-  animate(".view.active", { opacity: [0, 1], y: [8, 0] }, { duration: 0.28, easing: [0.16, 1, 0.3, 1] });
+  animate(".view.active", { opacity: [0, 1], y: [8, 0] }, { duration: 0.28, ease: [0.16, 1, 0.3, 1] });
 }
 
 function bindPressMotion(): void {
   if (prefersReducedMotion) return;
   press("button:not(:disabled), .listing-card:not(.is-sold-out)", (element) => {
     animate(element, { scale: 0.985 }, { duration: 0.1 });
-    return () => animate(element, { scale: 1 }, { duration: 0.18, easing: [0.16, 1, 0.3, 1] });
+    return () => animate(element, { scale: 1 }, { duration: 0.18, ease: [0.16, 1, 0.3, 1] });
   });
 }
 
@@ -131,7 +131,7 @@ function showToast(message: string): void {
   toast.textContent = message;
   region.append(toast);
   if (!prefersReducedMotion) {
-    animate(toast, { opacity: [0, 1], y: [12, 0] }, { duration: 0.22, easing: [0.16, 1, 0.3, 1] });
+    animate(toast, { opacity: [0, 1], y: [12, 0] }, { duration: 0.22, ease: [0.16, 1, 0.3, 1] });
   }
   window.setTimeout(() => toast.remove(), 3200);
 }
@@ -531,7 +531,7 @@ function openListing(listingId: string): void {
   dialog.showModal();
   if (!prefersReducedMotion) {
     animate(dialog, { opacity: [0, 1] }, { duration: 0.18 });
-    animate("#listing-dialog .modal-inner", { y: [18, 0], scale: [0.98, 1] }, { duration: 0.28, easing: [0.16, 1, 0.3, 1] });
+    animate("#listing-dialog .modal-inner", { y: [18, 0], scale: [0.98, 1] }, { duration: 0.28, ease: [0.16, 1, 0.3, 1] });
   }
 }
 
@@ -540,7 +540,7 @@ function openLocationDialog(): void {
   dialog.showModal();
   if (!prefersReducedMotion) {
     animate(dialog, { opacity: [0, 1] }, { duration: 0.18 });
-    animate("#location-dialog .modal-body", { y: [16, 0], scale: [0.98, 1] }, { duration: 0.24, easing: [0.16, 1, 0.3, 1] });
+    animate("#location-dialog .modal-body", { y: [16, 0], scale: [0.98, 1] }, { duration: 0.24, ease: [0.16, 1, 0.3, 1] });
   }
 }
 
