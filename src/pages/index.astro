@@ -1,5 +1,6 @@
 ---
-
+import { Clock3, List, Map, MapPinned, PackageCheck, Percent, ReceiptText, Search, ShoppingBag, Store } from "@lucide/astro";
+import "../styles/global.css";
 ---
 
 <html lang="en">
@@ -7,11 +8,186 @@
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<meta
+			name="description"
+			content="BreadSaver lets customers reserve discounted bakery surplus nearby and gives bakeries a fast pickup dashboard."
+		/>
+		<title>BreadSaver</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<div class="app-shell">
+			<nav class="nav-tabs app-nav" aria-label="Main views">
+				<button class="nav-tab active" data-view="market"><ShoppingBag size={16} aria-hidden="true" /> Bread</button>
+				<button class="nav-tab" data-view="orders"><ReceiptText size={16} aria-hidden="true" /> Pickup</button>
+				<button class="nav-tab" data-view="bakery"><Store size={16} aria-hidden="true" /> Sell</button>
+			</nav>
+
+			<main>
+				<section class="view active" id="market-view">
+					<section class="market-head" aria-labelledby="market-title">
+						<div class="market-title-row">
+							<div>
+								<p class="eyebrow">Setapak tonight</p>
+								<h1 id="market-title">Discounted bread</h1>
+							</div>
+							<button class="field-button location-pill" id="open-location"><MapPinned size={18} aria-hidden="true" /><span id="area-label">Setapak</span></button>
+						</div>
+						<div class="impact-strip" aria-label="Marketplace metrics">
+							<span><PackageCheck size={16} aria-hidden="true" /><strong id="metric-rescued">34</strong><small>rescued</small></span>
+							<span><Percent size={16} aria-hidden="true" /><strong id="metric-saved">RM126</strong><small>saved</small></span>
+							<span><Clock3 size={16} aria-hidden="true" /><strong id="metric-window">6:30 PM</strong><small>next</small></span>
+						</div>
+					</section>
+
+					<section class="controls" aria-label="Marketplace controls">
+						<label class="search-box">
+							<Search size={18} aria-hidden="true" />
+							<input id="search-input" type="search" placeholder="Search bread" autocomplete="off" />
+						</label>
+						<div class="segment" aria-label="Browse mode">
+							<button class="segment-button active" data-mode="list"><List size={15} aria-hidden="true" />List</button>
+							<button class="segment-button" data-mode="map"><Map size={15} aria-hidden="true" />Map</button>
+						</div>
+					</section>
+
+					<section class="chip-row" aria-label="Listing filters">
+						<button class="chip active" data-filter="all">All</button>
+						<button class="chip" data-filter="bread">Bread</button>
+						<button class="chip" data-filter="pastry">Pastry</button>
+						<button class="chip" data-filter="bundle">Bundles</button>
+					</section>
+
+					<section class="market-layout">
+						<aside class="active-order" aria-label="Active pickup" id="active-order"></aside>
+						<section id="list-panel">
+							<div class="section-title">
+								<div>
+									<p class="eyebrow">Now</p>
+									<h2>Available nearby</h2>
+								</div>
+								<span class="muted" id="result-count">0 listings</span>
+							</div>
+							<div class="listing-grid" id="listing-grid"></div>
+						</section>
+						<section class="map-panel hidden" id="map-panel" aria-label="Map view">
+							<div class="section-title">
+								<div>
+									<p class="eyebrow">Map</p>
+									<h2>Nearby pickup spots</h2>
+								</div>
+							</div>
+							<div id="map-listings"></div>
+						</section>
+					</section>
+				</section>
+
+				<section class="view" id="orders-view">
+					<div class="section-title">
+						<div>
+							<p class="eyebrow">Receipt</p>
+							<h1>My pickup</h1>
+						</div>
+					</div>
+					<div class="orders-list" id="orders-list"></div>
+				</section>
+
+				<section class="view" id="bakery-view">
+					<div id="bakery-auth" class="auth-box">
+						<p class="eyebrow">Bakery login</p>
+						<h1>Staff mode is locked.</h1>
+						<p>Continue as staff to simulate bakery login. Production uses Supabase Auth and RLS-backed bakery membership.</p>
+						<button class="primary-btn" id="bakery-login-inline">Continue as staff</button>
+					</div>
+
+					<section class="bakery-layout hidden" id="bakery-workspace">
+						<div class="panel bakery-summary">
+							<p class="eyebrow">Bakery dashboard</p>
+							<h1>Close today with less waste.</h1>
+							<div class="stat-grid">
+								<div class="stat-tile"><strong id="bakery-revenue">RM0</strong><span class="muted">recovered today</span></div>
+								<div class="stat-tile"><strong id="bakery-orders">0</strong><span class="muted">paid pickups</span></div>
+								<div class="stat-tile"><strong id="bakery-left">0</strong><span class="muted">items listed</span></div>
+							</div>
+							<p class="muted" id="backend-mode">Local demo mode</p>
+						</div>
+
+						<form class="panel form-grid listing-form-panel" id="listing-form">
+							<div class="section-title">
+								<div>
+									<p class="eyebrow">Create listing</p>
+									<h2>List surplus in under 30 seconds</h2>
+								</div>
+								<button type="button" class="ghost-btn" id="repeat-btn">Repeat yesterday</button>
+							</div>
+							<label>Item title<input name="title" value="Sourdough end-of-day bundle" required /></label>
+							<label>Quantity<input name="quantity" type="number" min="1" value="4" required /></label>
+							<label>Discount price RM<input name="discountedPrice" type="number" min="1" value="6" required /></label>
+							<label>Pickup start<input name="pickupStart" value="6:30 PM" required /></label>
+							<label>Pickup end<input name="pickupEnd" value="8:00 PM" required /></label>
+							<label>Allergens<textarea name="allergens" required>Contains wheat, milk, egg. May contain nuts.</textarea></label>
+							<details class="optional-fields">
+								<summary>More listing details</summary>
+								<label>Photo URL<input name="image" value="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80" required /></label>
+								<label>Category
+									<select name="category">
+										<option value="bundle">Bundle</option>
+										<option value="bread">Bread</option>
+										<option value="pastry">Pastry</option>
+									</select>
+								</label>
+								<label>Original price RM<input name="originalPrice" type="number" min="1" value="14" required /></label>
+								<label>Freshness label<input name="bakedLabel" value="Baked today" required /></label>
+								<label>What buyers could get<textarea name="description" required>Mixed sourdough slices, milk buns, and croissants packed after the evening count.</textarea></label>
+								<label>Ingredients<textarea name="ingredients" required>Sourdough, milk buns, croissants.</textarea></label>
+							</details>
+							<label class="check-row"><input name="safetyConfirmed" type="checkbox" checked required /> I confirm this food is safe to sell and must be collected within the pickup window.</label>
+							<button class="primary-btn" type="submit">Publish listing</button>
+						</form>
+
+						<div class="panel pickup-panel">
+							<p class="eyebrow">Pickup queue</p>
+							<h2>Paid orders waiting</h2>
+							<div class="pickup-queue" id="pickup-queue"></div>
+						</div>
+
+						<div class="panel active-panel">
+							<p class="eyebrow">Active listings</p>
+							<h2>Today on sale</h2>
+							<div class="active-list" id="active-listings"></div>
+						</div>
+					</section>
+				</section>
+			</main>
+		</div>
+
+		<dialog class="modal" id="listing-dialog">
+			<div id="listing-dialog-content"></div>
+		</dialog>
+
+		<dialog class="modal" id="location-dialog">
+			<div class="modal-body">
+				<div class="section-title">
+					<div>
+						<p class="eyebrow">Manual location fallback</p>
+						<h2>Choose pickup area</h2>
+					</div>
+					<button class="icon-btn" data-close-dialog aria-label="Close">Close</button>
+				</div>
+				<div class="location-options">
+					<button class="field-button" data-area="Setapak" data-radius="3">Setapak - 3 km</button>
+					<button class="field-button" data-area="Danau Kota" data-radius="5">Danau Kota - 5 km</button>
+					<button class="field-button" data-area="Campus zone" data-radius="2">Campus zone - 2 km</button>
+				</div>
+			</div>
+		</dialog>
+
+		<div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+		<script>
+			import { mountBreadSaverApp } from "../scripts/app";
+			mountBreadSaverApp();
+		</script>
 	</body>
 </html>

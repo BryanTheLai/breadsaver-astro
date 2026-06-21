@@ -12,6 +12,14 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^6.4.7"
+    "@lucide/astro": "1.21.0",
+    "@supabase/supabase-js": "2.108.2",
+    "astro": "6.4.8",
+    "mapbox-gl": "^3.25.0",
+    "motion": "^12.40.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.9",
+    "typescript": "6.0.3"
   }
 }

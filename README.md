@@ -1,43 +1,39 @@
-# Astro Starter Kit: Minimal
+# BreadSaver Astro Demo
+
+Mobile-first Astro prototype for discounted bakery surplus pickup.
+
+## Run
 
 ```sh
-npm create astro@latest -- --template minimal
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Local demo URL defaults to `http://localhost:4321`.
 
-## 🚀 Project Structure
+## What Works
 
-Inside of your Astro project, you'll see the following folders and files:
+- Customer browse, search, filters, list/Mapbox toggle, and missing-token map fallback.
+- Listing detail with price comparison, pickup window, trust, ingredients, and allergens.
+- Simulated payment/reservation with inventory decrement and pickup code receipt.
+- Simulated buyer session during checkout and bakery staff login.
+- Bakery listing creation, repeat yesterday, active listings, pickup queue, and mark picked up.
+- Supabase-ready client boundary through `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+- Mapbox GL JS map through `PUBLIC_MAPBOX_TOKEN`; use a public `pk.*` token only.
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+## Files
+
+- `src/pages/index.astro` - app shell and screen containers.
+- `src/scripts/app.ts` - local demo state, rendering, and user-flow logic.
+- `src/lib/marketplace.ts` - pure marketplace rules.
+- `src/lib/seed.ts` - seeded bakeries/listings.
+- `src/lib/supabaseClient.ts` - browser-safe Supabase client wrapper.
+- `docs/modules-and-flows.md` - scope, flows, edge cases, and overbuild cuts.
+- `supabase/schema.sql` - production schema/RLS sketch.
+
+## Verify
+
+```sh
+npx astro check
+npm run build
 ```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
